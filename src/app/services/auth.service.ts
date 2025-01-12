@@ -14,7 +14,7 @@ export class AuthService {
   private url: string = environment.api + 'users/';
   private authStatusListener = new Subject<boolean>();
 
-  private isAuthenticated = false;
+  private isAuthenticated = true;
   private token: string | null = '';
   private tokenTimer: any;
 
