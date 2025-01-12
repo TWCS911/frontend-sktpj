@@ -54,35 +54,35 @@ export class RegisterComponent implements OnInit {
   }
 
   onSubmit(form: FormGroup) {
-    this.submitted = true;
-    this.showSpinner = true;
-  
-    if (form.invalid) {
-      this.showSpinner = false;
-      return;
-    }
-  
-    // Panggil addUser dari userService
-    this.userService.addUser(form.value.email, form.value.password).subscribe({
-      next: (response) => {
-        console.log('Akun berhasil dibuat:', response.message);
-  
-        // Navigasi ke halaman login dengan queryParams
-        this.router.navigate(['/login'], { queryParams: { accountCreated: 'true' } });
-      },
-      error: (error) => {
-        console.error('Gagal membuat akun:', error);
-        this.showSpinner = false;
-  
-        // Tampilkan pesan error ke pengguna (opsional)
-        alert(error.error.message || 'Terjadi kesalahan. Silakan coba lagi.');
-      },
-      complete: () => {
-        this.showSpinner = false;
-      },
-    });
+  this.submitted = true;
+  this.showSpinner = true;
+
+  if (form.invalid) {
+    this.showSpinner = false;
+    return;
   }
-  
+
+  // Panggil addUser dari userService
+  this.userService.addUser(form.value.email, form.value.password).subscribe({
+    next: (response) => {
+      console.log('Akun berhasil dibuat:', response.message);
+
+      // Navigasi ke halaman login dengan queryParams
+      this.router.navigate(['/login'], { queryParams: { accountCreated: 'true' } });
+    },
+    error: (error) => {
+      console.error('Gagal membuat akun:', error);
+      this.showSpinner = false;
+
+      // Tampilkan pesan error ke pengguna (opsional)
+      alert(error.error.message || 'Terjadi kesalahan. Silakan coba lagi.');
+    },
+    complete: () => {
+      this.showSpinner = false;
+    },
+  });
+}
+
 
   checkIfMatchingPasswords(
     passwordKey: string,

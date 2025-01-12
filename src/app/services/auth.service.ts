@@ -14,7 +14,7 @@ export class AuthService {
   private url: string = environment.api + 'users/';
   private authStatusListener = new Subject<boolean>();
 
-  private isAuthenticated = false;
+  private isAuthenticated = true;
   private token: string | null = '';
   private tokenTimer: any;
 
@@ -94,6 +94,7 @@ export class AuthService {
   }
 
   getIsAuth() {
+    console.log('AuthService - isAuthenticated:', this.isAuthenticated);
     return this.isAuthenticated;
   }
 
@@ -102,6 +103,7 @@ export class AuthService {
       console.error('Invalid expiration date:', expirationDate);
       return; // Tidak menyimpan jika expirationDate tidak valid
     }
+    console.log('Saving Auth Data:', { token, expirationDate });
     localStorage.setItem('token', token);
     localStorage.setItem('expiration', expirationDate.toISOString());
   }
@@ -140,14 +142,14 @@ export class AuthService {
 
   autoAuthUser() {
     const authInformation = this.getAuthData();
-
+  
     if (!authInformation) {
       return;
     }
-
+  
     const now = new Date();
     const expiresIn = authInformation.expirationDate.getTime() - now.getTime();
-
+  
     if (expiresIn > 0) {
       this.token = authInformation.token;
       this.isAuthenticated = true;
@@ -155,6 +157,8 @@ export class AuthService {
       this.authStatusListener.next(true);
     }
   }
+  
+
 
   logout() {
     this.token = null;

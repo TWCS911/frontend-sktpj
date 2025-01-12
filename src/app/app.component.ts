@@ -10,8 +10,9 @@ import { AuthService } from './services/auth.service';
 export class AppComponent {
   title = 'prj-sktpj';
 
-  constructor(private authService: AuthService) {
-    this.authService.autoAuthUser();
-    
+  constructor(private authService: AuthService) {}
+
+  ngOnInit() {
+    this.authService.autoAuthUser(); // Pastikan dipanggil di sini
   }
 }
