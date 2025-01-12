@@ -3,6 +3,7 @@ import { TransaksiService } from '../services/transaksi.service';
 import { BarangService } from '../services/barang.service';
 import { Barang } from '../models/barang.model';
 import Swal from 'sweetalert2';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-barang-keluar',
@@ -23,7 +24,8 @@ export class BarangKeluarComponent implements OnInit {
 
   constructor(
     private transaksiService: TransaksiService,
-    private barangService: BarangService
+    private barangService: BarangService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -106,7 +108,7 @@ export class BarangKeluarComponent implements OnInit {
               title: 'Berhasil!',
               text: 'Barang keluar berhasil ditambahkan.',
               icon: 'success',
-              confirmButtonText: 'OK'
+              confirmButtonText: 'OK',
             }).then(() => {
               window.location.reload(); // Reload halaman agar data baru langsung tampil
             });
@@ -116,6 +118,7 @@ export class BarangKeluarComponent implements OnInit {
             console.error(error);
           }
         );
+        this.router.navigate(['/admin/']);
       }
     });
   }

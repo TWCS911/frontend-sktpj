@@ -6,6 +6,7 @@ import { Barang } from '../models/barang.model';
 import { Transaksi } from '../models/transaksi.model';
 import Swal from 'sweetalert2';
 import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-barang-masuk',
@@ -29,6 +30,7 @@ export class BarangMasukComponent implements OnInit, OnDestroy {
   constructor(
     private barangService: BarangService,
     private transaksiService: TransaksiService,
+    private router: Router,
     @Inject(PLATFORM_ID) private platformId: any
   ) {}
 
@@ -113,7 +115,7 @@ export class BarangMasukComponent implements OnInit, OnDestroy {
         result => {
           console.log('Barang masuk berhasil ditambahkan!', result);
           // Setelah barang berhasil ditambahkan, muat ulang daftar transaksi
-          this.loadTransaksiList();
+          this.router.navigate(['/admin/']);
         },
         error => {
           console.error('Error adding barang masuk!', error);
