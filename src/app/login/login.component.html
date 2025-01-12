@@ -1,0 +1,97 @@
+<div class="position-relative">
+    <div class="authentication-wrapper authentication-basic container-p-y">
+      <div class="authentication-inner py-6" style="margin-top: 4cm;">
+        <!-- Login -->
+        <div class="card p-4 shadow-sm" style="max-width: 400px; margin: auto; border-radius: 8px;">
+          <!-- Logo -->
+          <div class="app-brand justify-content-center mt-5">
+            <a href="/" class="app-brand-link gap-3">
+              <img src="../assets/img/logo_maggha_side.png" alt="Logo" class="w-px-200 h-auto" />
+            </a>
+          </div>
+          <!-- /Logo -->
+  
+          <div class="card-body mt-3">
+            <div class="d-flex flex-column justify-content-start align-items-center mt-4">
+              <h4 class="mb-3">Welcome to Maggha! 👋🏻</h4>
+              <div *ngIf="accountCreatedMessage" class="alert alert-success" role="alert">
+                {{ accountCreatedMessage }}
+              </div>
+            </div>
+  
+            <form
+                    [formGroup]="loginForm"
+                    (ngSubmit)="onSubmit(loginForm)"
+                  >
+              <div class="form-floating form-floating-outline mb-4">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="email"
+                  formControlName="email"
+                  placeholder="Enter your email"
+                  autofocus
+                  [class.is-invalid]="submitted && loginForm.controls['email'].invalid"
+                />
+                <label for="email">Email</label>
+                <div *ngIf="submitted && loginForm.controls['email'].invalid" class="invalid-feedback">
+                  <div *ngIf="loginForm.controls['email'].errors?.['required']">Email is required.</div>
+                  <div *ngIf="loginForm.controls['email'].errors?.['email']">Please enter a valid email.</div>
+                </div>
+              </div>
+  
+              <div class="mb-4">
+                <div class="form-password-toggle">
+                  <div class="input-group input-group-merge">
+                    <div class="form-floating form-floating-outline">
+                      <input
+                        type="password"
+                        id="password"
+                        class="form-control"
+                        formControlName="password"
+                        placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+                        aria-describedby="password"
+                        [class.is-invalid]="submitted && loginForm.controls['password'].invalid"
+                      />
+                      <label for="password">Password</label>
+                    </div>
+                  </div>
+                  <div *ngIf="submitted && loginForm.controls['password'].invalid" class="invalid-feedback">
+                    <div *ngIf="loginForm.controls['password'].errors?.['required']">Password is required.</div>
+                  </div>
+                </div>
+              </div>
+  
+              <div class="mb-4 pb-2 d-flex justify-content-between align-items-center">
+                <div class="form-check mb-0">
+                  <input class="form-check-input" type="checkbox" id="remember-me" />
+                  <label class="form-check-label" for="remember-me"> Remember Me </label>
+                </div>
+                <a href="auth-forgot-password-basic.html" class="float-end mb-1">
+                  <span>Forgot Password?</span>
+                </a>
+              </div>
+  
+              <div class="mb-4">
+                <button class="btn btn-primary d-grid w-100" type="submit" [disabled]="showSpinner">
+                  <span *ngIf="!showSpinner">Login</span>
+                  <span *ngIf="showSpinner">
+                    <i class="spinner-border spinner-border-sm"></i> Loading...
+                  </span>
+                </button>
+              </div>
+            </form>
+  
+            <p class="text-center mb-4">
+              <span>New on our platform? </span>
+              <a href="/register">
+                <span>Create an account</span>
+              </a>
+            </p>
+          </div>
+        </div>
+        <!-- /Login -->
+      </div>
+    </div>
+  </div>
+  
