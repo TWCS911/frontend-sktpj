@@ -170,10 +170,7 @@ export class BarangMasukComponent implements OnInit {
             text: 'Barang masuk berhasil ditambahkan.',
             icon: 'success',
             confirmButtonText: 'OK'
-          }).then(() => {
-            // Refresh halaman untuk memuat data baru
-            window.location.reload();
-          });
+          })
         },
         (error) => {
           Swal.fire('Gagal!', 'Terjadi kesalahan saat menambahkan barang masuk.', 'error');
