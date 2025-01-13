@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
+import { afterNextRender, Inject, Injectable } from '@angular/core';
 import { User } from '../models/user.model';
 import { Subject } from 'rxjs';
 import { Router } from '@angular/router';
@@ -12,9 +12,10 @@ import { environment } from '../environments/environment';
 })
 export class AuthService {
   private url: string = environment.api + 'users/';
+  //private url: string = 'http://localhost:3000/users/';
   private authStatusListener = new Subject<boolean>();
 
-  private isAuthenticated = true;
+  private isAuthenticated = false;
   private token: string | null = '';
   private tokenTimer: any;
 
@@ -39,55 +40,35 @@ export class AuthService {
       password: password,
     };
 
-    console.log('User Login:', user);
+    console.log(user);
 
     this.http
       .post<{ token: string; expiresIn: number }>(this.url + 'login', user)
       .subscribe(
         (response) => {
-          console.log('Backend Response:', response);
-
           const token = response.token;
-          const expiresInDuration = response.expiresIn;
-
-          if (!expiresInDuration) {
-            console.error('Invalid expiration duration:', expiresInDuration);
-            return; // If expiresIn is undefined or invalid, stop further processing
-          }
-
           this.token = token;
           if (token) {
-            // Check if expiresInDuration is valid
-            if (isNaN(expiresInDuration) || expiresInDuration <= 0) {
-              console.error('Invalid expiration duration:', expiresInDuration);
-              return; // Stop if expiresIn is not valid
-            }
-
+            const expiresInDuration = response.expiresIn;
             this.setAuthTimer(expiresInDuration);
             this.isAuthenticated = true;
             this.authStatusListener.next(true);
-
             const now = new Date();
-            const expirationDate = new Date(now.getTime() + expiresInDuration * 1000);
-
-            // Check if expirationDate is valid
-            if (isNaN(expirationDate.getTime())) {
-              console.error('Invalid expiration date:', expirationDate);
-              return; // Stop if expirationDate is not valid
-            }
-
-            console.log('Token expires at:', expirationDate);
+            const expirationDate = new Date(
+              now.getTime() + expiresInDuration * 1000
+            );
+            console.log(expirationDate);
             this.saveAuthData(token, expirationDate);
-            this.router.navigate(['/admin/']);
+            this.router.navigate(['/admin/']).then(() => {
+              window.location.reload();
+            });
           }
         },
         (error) => {
-          console.error('Login Error:', error);
           this.authStatusListener.next(false);
         }
       );
-}
-
+  }
 
   getToken() {
     return this.token;
@@ -98,10 +79,6 @@ export class AuthService {
   }
 
   private saveAuthData(token: string, expirationDate: Date) {
-    if (isNaN(expirationDate.getTime())) {
-      console.error('Invalid expiration date:', expirationDate);
-      return; // Tidak menyimpan jika expirationDate tidak valid
-    }
     localStorage.setItem('token', token);
     localStorage.setItem('expiration', expirationDate.toISOString());
   }
@@ -120,45 +97,34 @@ export class AuthService {
       expirationDate = localStorage.getItem('expiration');
     }
 
+    //console.log(token);
     if (!token || !expirationDate) {
       return;
     }
-
-    const parsedExpirationDate = new Date(expirationDate);
-    
-    // Memastikan expirationDate valid
-    if (isNaN(parsedExpirationDate.getTime())) {
-      console.error('Invalid expiration date:', parsedExpirationDate);
-      return;
-    }
-
     return {
       token: token,
-      expirationDate: parsedExpirationDate,
+      expirationDate: new Date(expirationDate),
     };
   }
 
   autoAuthUser() {
     const authInformation = this.getAuthData();
-  
+
     if (!authInformation) {
       return;
     }
-  
+
     const now = new Date();
     const expiresIn = authInformation.expirationDate.getTime() - now.getTime();
-  
+
     if (expiresIn > 0) {
       this.token = authInformation.token;
       this.isAuthenticated = true;
       this.setAuthTimer(expiresIn / 1000);
       this.authStatusListener.next(true);
-      
-      // Setelah berhasil autentikasi, arahkan ke halaman /admin/
       this.router.navigate(['/admin/']);
     }
   }
-  
 
   logout() {
     this.token = null;
