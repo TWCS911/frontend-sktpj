@@ -26,6 +26,7 @@
             "outputPath": "dist/prj-sktpjs",
             "index": "src/index.html",
             "browser": "src/main.ts",
+            "baseHref": "/admin/",
             "polyfills": [
               "zone.js"
             ],
