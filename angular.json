@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "prjSktpjs": {
+    "prj-sktpj": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -23,7 +23,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/prj-sktpjs",
+            "outputPath": "dist/prj-sktpj",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -39,11 +39,15 @@
             "styles": [
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [],
+            "server": "src/main.server.ts",
+            "outputMode": "server",
+            "ssr": {
+              "entry": "src/server.ts"
+            }
           },
           "configurations": {
             "production": {
-              "aot": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -59,6 +63,7 @@
               "outputHashing": "all"
             },
             "development": {
+              "aot": true,
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
@@ -70,10 +75,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "prjSktpjs:build:production"
+              "buildTarget": "prj-sktpj:build:production"
             },
             "development": {
-              "buildTarget": "prjSktpjs:build:development"
+              "buildTarget": "prj-sktpj:build:development"
             }
           },
           "defaultConfiguration": "development"
