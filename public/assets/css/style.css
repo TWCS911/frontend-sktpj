@@ -1,0 +1,61 @@
+/* Kotak utama dengan desain samar dan sudut rounded */
+.rounded-box {
+    width: 100%; /* Membuat kotak responsif */
+    height: 150px;
+    background: white; /* Desain samar-samar */
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    flex-direction: column;
+    text-align: center;
+  }
+
+  /* Logo kotak */
+
+  /* Angka */
+  .number {
+    font-size: 30px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  /* Nama */
+  .name {
+    font-size: 16px;
+    color: #666;
+  }
+
+  /* Responsif untuk kolom */
+  .container-xxl {
+    padding: 20px;
+  }
+
+  /* Menambahkan jarak antar kolom */
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Menambahkan jarak antar kolom */
+    margin-bottom: 50px; /* Menambahkan jarak antar row */
+  }
+  
+  /* Agar row terakhir tidak memiliki margin bawah */
+  .row:last-child {
+    margin-bottom: 0;
+  }
+
+  .col-md-12, .col-lg-3 {
+    flex: 1 1 100%; /* Membuat kolom fleksibel dan responsif */
+    max-width: calc(25% - 20px); /* Maksimal kolom 4 dalam satu baris */
+    box-sizing: border-box;
+  }
+
+  /* Responsif untuk layar kecil */
+  @media (max-width: 768px) {
+    .col-lg-3 {
+      max-width: 100%; /* Kolom penuh pada layar kecil */
+    }
+  }
+  
