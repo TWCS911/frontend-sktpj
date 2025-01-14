@@ -1,145 +1,158 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, Input, ChangeDetectorRef } from '@angular/core';
 import { TransaksiService } from '../services/transaksi.service';
-import { BarangService } from '../services/barang.service';
 import { Barang } from '../models/barang.model';
+import { Transaksi } from '../models/transaksi.model';
+import { Subscription } from 'rxjs';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-barang-keluar',
-  standalone: false,
   templateUrl: './barang-keluar.component.html',
-  styleUrls: ['./barang-keluar.component.css']
+  styleUrls: ['./barang-keluar.component.css'],
 })
-export class BarangKeluarComponent implements OnInit {
+export class BarangKeluarComponent implements OnInit, OnDestroy {
+  @Input() refreshBarangKeluar: boolean = false;
+
+  isLoading: boolean = false;
+  transaksiList: Transaksi[] = [];  // Ubah menjadi array Transaksi
   barangList: Barang[] = [];
-  transaksiList: any[] = []; // Daftar transaksi barang keluar
-  filteredBarangKeluarList: any[] = []; // Daftar barang keluar yang sudah difilter
-  selectedBarangId: string = '';
-  jumlah: number = 0;
-  penerima: string = '';
-  keterangan: string = '';
-  searchQuery: string = ''; // Untuk pencarian barang keluar
-  p: number = 1; // Pagination
+  newBarangKeluar = {
+    idBarang: '',      // ID barang yang dipilih
+    jumlah: 0,
+    penerima: '',
+    keterangan: '',
+    tanggalKeluar: new Date().toISOString().split('T')[0],
+  };
+  private barangSub: Subscription = new Subscription();
+  private transaksiSub: Subscription = new Subscription();  // Ganti dengan transaksiSub
+
+  // Pagination
+  p: number = 1;
 
   constructor(
     private transaksiService: TransaksiService,
-    private barangService: BarangService
+    private cdRef: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.loadBarangList();
-    this.loadBarangKeluar();
+    this.loadBarang();
+    this.loadTransaksi();  // Ganti dengan loadTransaksi
   }
 
-  // Memuat daftar barang dari BarangService
-  loadBarangList(): void {
-    this.barangService.getBarang();
-    this.barangService.getBarangListener().subscribe(
-      (data) => {
-        this.barangList = data;
+  ngOnDestroy(): void {
+    this.barangSub.unsubscribe();
+    this.transaksiSub.unsubscribe();  // Ganti dengan transaksiSub
+  }
+
+  loadBarang(): void {
+    this.transaksiService.getAllBarang().subscribe({
+      next: (barang) => {
+        this.barangList = barang;
+        this.cdRef.detectChanges();
       },
-      (error) => {
-        console.error('Error loading barang list!', error);
-      }
-    );
-  }
-
-  // Memuat daftar barang keluar dari TransaksiService
-  loadBarangKeluar(): void {
-    this.transaksiService.getBarangKeluar().subscribe(
-      (data) => {
-        this.transaksiList = data;
-        this.filteredBarangKeluarList = data;
+      error: (err) => {
+        console.error('Gagal memuat data barang:', err);
       },
-      (error) => {
-        console.error('Error loading barang keluar!', error);
-      }
-    );
-  }
-
-  // Fungsi untuk menambah barang keluar
-  tampilkanFormTambah(): void {
-    Swal.fire({
-      title: 'Tambah Barang Keluar',
-      html: `
-        <div class="form-group mb-3">
-          <!-- Select untuk memilih barang -->
-          <select id="barangSelect" class="form-control" style="margin-top: 10px;">
-            <option value="">-- Pilih Barang --</option>
-            ${this.barangList.map(barang => `
-              <option value="${barang._id}">${barang.nama} - ${barang.merk}</option>
-            `).join('')}
-          </select>
-        </div>
-        <div class="form-group mb-3">
-          <input type="number" id="jumlahInput" class="form-control" min="1" placeholder="Jumlah barang">
-        </div>
-        <div class="form-group mb-3">
-          <input type="text" id="penerimaInput" class="form-control" placeholder="Masukkan nama penerima">
-        </div>
-        <div class="form-group mb-3">
-          <input type="text" id="keteranganInput" class="form-control" placeholder="Masukkan keterangan">
-        </div>
-      `,
-      showCancelButton: true,
-      confirmButtonText: 'Tambah',
-      cancelButtonText: 'Batal',
-      preConfirm: () => {
-        const selectedBarangId = (document.getElementById('barangSelect') as HTMLSelectElement).value;
-        const jumlah = (document.getElementById('jumlahInput') as HTMLInputElement).value;
-        const penerima = (document.getElementById('penerimaInput') as HTMLInputElement).value;
-        const keterangan = (document.getElementById('keteranganInput') as HTMLInputElement).value;
-
-        if (!selectedBarangId || !jumlah || parseInt(jumlah) <= 0 || !penerima) {
-          Swal.showValidationMessage('Harap isi semua field dengan benar!');
-          return false;
-        }
-
-        return { selectedBarangId, jumlah: parseInt(jumlah), penerima, keterangan };
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        const { selectedBarangId, jumlah, penerima, keterangan } = result.value;
-        this.transaksiService.tambahBarangKeluar(selectedBarangId, jumlah, penerima, keterangan).subscribe(
-          () => {
-            Swal.fire({
-              title: 'Berhasil!',
-              text: 'Barang keluar berhasil ditambahkan.',
-              icon: 'success',
-              confirmButtonText: 'OK'
-            }).then(() => {
-              window.location.reload(); // Reload halaman agar data baru langsung tampil
-            });
-          },
-          (error) => {
-            Swal.fire('Gagal!', 'Terjadi kesalahan saat menambahkan barang keluar.', 'error');
-            console.error(error);
-          }
-        );
-      }
     });
   }
 
-  // Fungsi untuk pencarian barang keluar
-  searchBarangKeluar(): void {
-    if (this.searchQuery.trim()) {
-      this.filteredBarangKeluarList = this.transaksiList.filter((transaksi) =>
-        transaksi.barang.nama.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        transaksi.barang.merk.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        transaksi.barang.jenis.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        transaksi.penerima.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        transaksi.keterangan.toLowerCase().includes(this.searchQuery.toLowerCase())
-      );
-    } else {
-      this.filteredBarangKeluarList = this.transaksiList;
+  loadTransaksi(): void {  // Ganti dengan loadTransaksi
+    this.transaksiService.getBarangKeluar().subscribe({
+      next: (transaksi) => {
+        this.transaksiList = transaksi;  // Menyimpan hasil ke transaksiList
+        this.cdRef.detectChanges();
+      },
+      error: (err) => {
+        console.error('Gagal memuat data transaksi:', err);
+      },
+    });
+  }
+
+  tambahBarangKeluar(): void {
+    if (!this.newBarangKeluar.idBarang || this.newBarangKeluar.jumlah <= 0 || !this.newBarangKeluar.penerima) {
+      Swal.fire({
+        title: 'Error',
+        text: 'Pilih barang, masukkan jumlah yang valid, dan isi penerima.',
+        icon: 'error',
+        confirmButtonText: 'OK',
+      });
+      return;
     }
+
+    this.isLoading = true;
+    this.transaksiService.tambahBarangKeluar(
+      this.newBarangKeluar.idBarang,
+      this.newBarangKeluar.jumlah,
+      this.newBarangKeluar.penerima,
+      this.newBarangKeluar.keterangan
+    ).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        Swal.fire({
+          title: 'Barang Keluar Ditambahkan',
+          text: `Barang keluar berhasil ditambahkan.`,
+          icon: 'success',
+          confirmButtonText: 'OK',
+        });
+        this.loadTransaksi();  // Memuat ulang data transaksi
+        this.resetForm();
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.error('Gagal menambahkan barang keluar:', err);
+        Swal.fire({
+          title: 'Error',
+          text: 'Terjadi kesalahan saat menambahkan barang keluar.',
+          icon: 'error',
+          confirmButtonText: 'OK',
+        });
+      },
+    });
   }
 
-  trackById(index: number, item: any): string {
-    return item._id; // Menggunakan _id dari transaksi untuk trackBy
+  resetForm(): void {
+    this.newBarangKeluar = {
+      idBarang: '',
+      jumlah: 0,
+      penerima: '',
+      keterangan: '',
+      tanggalKeluar: new Date().toISOString().split('T')[0],
+    };
   }
 
-  paginate(pageNumber: number): void {
-    this.p = pageNumber; // Menetapkan halaman yang dipilih
+  deleteBarangKeluar(id: string): void {
+    Swal.fire({
+      title: 'Hapus Barang Keluar?',
+      text: 'Apakah Anda yakin ingin menghapus data ini?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ya, hapus!',
+      cancelButtonText: 'Batal',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.transaksiService.hapusBarangKeluar(id).subscribe({
+          next: () => {
+            Swal.fire({
+              title: 'Terhapus!',
+              text: 'Data barang keluar berhasil dihapus.',
+              icon: 'success',
+              confirmButtonText: 'OK',
+            });
+            this.loadTransaksi();  // Memuat ulang data transaksi
+          },
+          error: (err) => {
+            console.error('Gagal menghapus barang keluar:', err);
+            Swal.fire({
+              title: 'Error',
+              text: 'Terjadi kesalahan saat menghapus barang keluar.',
+              icon: 'error',
+              confirmButtonText: 'OK',
+            });
+          },
+        });
+      }
+    });
   }
 }
