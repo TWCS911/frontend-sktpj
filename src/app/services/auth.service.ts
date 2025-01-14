@@ -78,7 +78,9 @@ export class AuthService {
 
             console.log('Token expires at:', expirationDate);
             this.saveAuthData(token, expirationDate);
-            this.router.navigate(['/admin/']);
+            this.router.navigate(['/admin/']).then(() => {
+              window.location.reload();
+            });
           }
         },
         (error) => {
@@ -94,6 +96,7 @@ export class AuthService {
   }
 
   getIsAuth() {
+    console.log('AuthService - isAuthenticated:', this.isAuthenticated);
     return this.isAuthenticated;
   }
 
@@ -102,6 +105,7 @@ export class AuthService {
       console.error('Invalid expiration date:', expirationDate);
       return; // Tidak menyimpan jika expirationDate tidak valid
     }
+    console.log('Saving Auth Data:', { token, expirationDate });
     localStorage.setItem('token', token);
     localStorage.setItem('expiration', expirationDate.toISOString());
   }
@@ -153,12 +157,10 @@ export class AuthService {
       this.isAuthenticated = true;
       this.setAuthTimer(expiresIn / 1000);
       this.authStatusListener.next(true);
-      
-      // Setelah berhasil autentikasi, arahkan ke halaman /admin/
-      this.router.navigate(['/admin/']);
     }
   }
   
+
 
   logout() {
     this.token = null;
