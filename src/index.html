@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    
+    <meta charset="utf-8" />
+    <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+
+    <title>Dashboard - Analytics | Materio - Bootstrap Material Design Admin Template</title>
+
+    <meta name="description" content="" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/assets/img/favicon/favicon.ico" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&ampdisplay=swap"
+      rel="stylesheet" />
+
+    <link rel="stylesheet" href="/assets/vendor/fonts/remixicon/remixicon.css" />
+
+    <!-- Menu waves for no-customizer fix -->
+    <link rel="stylesheet" href="/assets/vendor/libs/node-waves/node-waves.css" />
+
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="/assets/vendor/css/core.css" class="template-customizer-core-css" />
+    <link rel="stylesheet" href="/assets/vendor/css/theme-default.css" class="template-customizer-theme-css" />
+    <link rel="stylesheet" href="/assets/css/demo.css" />
+
+    <!-- Vendors CSS -->
+    <link rel="stylesheet" href="/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+    <link rel="stylesheet" href="/assets/css/style.css" />
+    <link rel="stylesheet" href="/assets/vendor/libs/apex-charts/apex-charts.css" />
+    <style>
+      .menu-item.active {
+        background: radial-gradient(270deg, #8f5bff 0%, #c5aaff 100%);
+      }
+      /* Membuat tabel menjadi responsif dengan scroll horizontal jika overflow */
+      .table-responsive {
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* Atur padding dan margin agar tidak ada overflow di luar batas */
+      .card-body {
+        padding: 0;
+        margin: 0;
+      }
+
+      /* Untuk memastikan kolom tabel menyesuaikan dengan layar kecil */
+      @media (max-width: 768px) {
+        .table thead {
+          display: none; /* Menyembunyikan header pada perangkat kecil */
+        }
+
+        .table, .table tbody, .table tr, .table td {
+          display: block;
+          width: 100%;
+        }
+
+        .table tr {
+          margin-bottom: 10px;
+        }
+
+        .table td {
+          display: flex;
+          justify-content: space-between;
+          padding: 8px;
+          border: 1px solid #ddd;
+        }
+
+        .table td:before {
+          content: attr(data-label);
+          font-weight: bold;
+          margin-right: 8px;
+        }
+
+        /* Membuat card tetap berada di tengah dan dapat menyesuaikan lebar layar */
+        .card {
+          width: 100%;
+          max-width: 1000px;
+          margin: 20px auto; /* Membuat card berada di tengah halaman */
+        }
+
+        /* Mengatur tabel agar bisa scroll secara horizontal ketika lebar layar kecil */
+        .table-responsive {
+          overflow-x: auto; /* Membuat scroll horizontal pada tabel ketika lebar melebihi batas */
+          -webkit-overflow-scrolling: touch; /* Menambahkan scroll pada perangkat mobile */
+        }
+
+        .table {
+          width: 100%;
+          table-layout: fixed; /* Menjaga ukuran kolom tetap konsisten */
+        }
+
+        .table th, .table td {
+          font-size: 14px; /* Ukuran font lebih kecil agar pas di layar */
+        }
+
+        .btn-sm {
+          font-size: 12px;
+          padding: 5px 10px;
+        }
+
+      }
+      /* Menambahkan jarak antara tabel dan pagination */
+      .table-responsive {
+          margin-bottom: 20px; /* Memberikan jarak bawah pada tabel */
+      }
+
+      /* Atau jika Anda ingin menambahkan jarak pada pagination */
+      .pagination-controls {
+          margin-top: 20px; /* Memberikan jarak atas pada pagination */
+      }
+
+      /* Menetapkan lebar card menjadi 1000px dan membuatnya responsif */
+      /* Styling untuk SweetAlert */
+      .swal2-popup {
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        padding: 0;
+      }
+
+      .popup-form {
+        padding: 20px;
+        background-color: #f4f7fb;
+      }
+
+      .title-form {
+        font-size: 24px;
+        color: #4CAF50;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+
+      .input-form {
+        margin-bottom: 15px;
+        padding: 12px;
+        font-size: 14px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        transition: all 0.3s ease;
+      }
+
+      .input-form:focus {
+        outline: none;
+        border-color: #4CAF50;
+        box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+      }
+
+      .actions-form {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .actions-form .btn {
+        padding: 12px 25px;
+        font-size: 14px;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 48%;
+      }
+
+      .actions-form .btn-success {
+        background-color: #28a745;
+        color: white;
+        border: none;
+      }
+
+      .actions-form .btn-success:hover {
+        background-color: #218838;
+      }
+
+      .actions-form .btn-danger {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+      }
+
+      .actions-form .btn-danger:hover {
+        background-color: #c82333;
+      }
+
+    </style>
+
+    <!-- Page CSS -->
+
+    <!-- Helpers -->
+    <script src="/assets/vendor/js/helpers.js"></script>
+    <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
+    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <script src="/assets/js/config.js"></script>
+    </head>
+<body>
+  <app-root></app-root>
+
+    <script src="/assets/vendor/libs/jquery/jquery.js"></script>
+    <script src="/assets/vendor/libs/popper/popper.js"></script>
+    <script src="/assets/vendor/js/bootstrap.js"></script>
+    <script src="/assets/vendor/libs/node-waves/node-waves.js"></script>
+    <script src="/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+    <script src="/assets/vendor/js/menu.js"></script>
+
+    <!-- endbuild -->
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        // Pilih elemen container utama (bisa body atau wrapper menu)
+        const container = document.body; // Sesuaikan dengan elemen terluar yang stabil
+
+        // Gunakan event delegation untuk menangkap klik pada elemen tertentu
+        container.addEventListener('click', function (event) {
+          // Periksa apakah elemen yang diklik adalah menu-item target-menu
+          const targetMenuItem = event.target.closest('.menu-item.target-menu');
+          
+          // Periksa apakah klik terjadi di dalam submenu (menu-sub)
+          const targetSubMenu = event.target.closest('.menu-sub');
+          
+          // Jika klik terjadi di menu-item target-menu dan bukan di dalam menu-sub
+          if (targetMenuItem && !targetSubMenu) {
+            // Jika sudah ada menu-item lain dengan class 'open', hapus class 'open' mereka
+            const openItems = container.querySelectorAll('.menu-item.target-menu.open');
+            openItems.forEach(item => {
+              if (item !== targetMenuItem) {
+                item.classList.remove('open');
+              }
+            });
+
+            // Toggle class 'open' pada elemen yang ditekan
+            targetMenuItem.classList.toggle('open');
+          }
+
+          // Jika klik terjadi pada submenu (menu-sub), biarkan menu utama tetap terbuka
+          if (targetSubMenu) {
+            const targetMenuItem = event.target.closest('.menu-item.target-menu');
+            if (targetMenuItem) {
+              targetMenuItem.classList.add('open');
+            }
+          }
+        });
+      });
+    </script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const menuItems = document.querySelectorAll('.menu-item.target');
+
+        menuItems.forEach(item => {
+          item.addEventListener('click', function() {
+            menuItems.forEach(menu => menu.classList.remove('active'));
+            this.classList.add('active');
+          });
+        });
+      });
+
+
+    </script>
+
+
+
+    <!-- Vendors JS -->
+    <script src="/assets/vendor/libs/apex-charts/apexcharts.js"></script>
+
+    <!-- Main JS -->
+
+
+    <!-- Page JS -->
+    <script src="/assets/js/dashboards-analytics.js"></script>
+
+    <!-- Place this tag before closing body tag for github widget button. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+</body>
+</html>
