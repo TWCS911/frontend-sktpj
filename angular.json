@@ -44,8 +44,7 @@
             "outputMode": "server",
             "ssr": {
               "entry": "src/server.ts"
-            },
-            "baseHref": "/"
+            }
           },
           "configurations": {
             "production": {
