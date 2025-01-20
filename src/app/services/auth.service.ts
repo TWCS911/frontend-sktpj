@@ -64,7 +64,7 @@ export class AuthService {
         this.authStatusListener.next(true);
 
         this.router.navigate(['/admin']).then(() => {
-          window.location.reload();
+          // window.location.reload();
         });
       }
     },
