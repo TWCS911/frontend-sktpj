@@ -30,65 +30,51 @@ export class AuthService {
     private router: Router
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
+  
+    if (this.isBrowser) {
+      console.log('Constructor: Running in a browser environment.');
+    } else {
+      console.log('Constructor: Running in a server environment (SSR).');
+    }
   }
+  
 
   login(email: string, password: string) {
-    const user: User = {
-      _id: null,
-      email: email,
-      password: password,
-    };
+  const user: User = { _id: null, email: email, password: password };
+  console.log('User Login:', user);
 
-    console.log('User Login:', user);
+  if (!this.isBrowser) {
+    console.warn('login: Not running in a browser environment.');
+    return; // Hentikan jika bukan di browser
+  }
 
-    this.http
-      .post<{ token: string; expiresIn: number }>(this.url + 'login', user)
-      .subscribe(
-        (response) => {
-          console.log('Backend Response:', response);
+  this.http.post<{ token: string; expiresIn: number }>(this.url + 'login', user).subscribe(
+    (response) => {
+      const token = response.token;
+      const expiresInDuration = response.expiresIn;
 
-          const token = response.token;
-          const expiresInDuration = response.expiresIn;
+      if (token && expiresInDuration > 0) {
+        this.token = token;
+        const now = new Date();
+        const expirationDate = new Date(now.getTime() + expiresInDuration * 1000);
 
-          if (!expiresInDuration) {
-            console.error('Invalid expiration duration:', expiresInDuration);
-            return; // If expiresIn is undefined or invalid, stop further processing
-          }
+        this.saveAuthData(token, expirationDate);
+        this.setAuthTimer(expiresInDuration);
+        this.isAuthenticated = true;
+        this.authStatusListener.next(true);
 
-          this.token = token;
-          if (token) {
-            // Check if expiresInDuration is valid
-            if (isNaN(expiresInDuration) || expiresInDuration <= 0) {
-              console.error('Invalid expiration duration:', expiresInDuration);
-              return; // Stop if expiresIn is not valid
-            }
-
-            this.setAuthTimer(expiresInDuration);
-            this.isAuthenticated = true;
-            this.authStatusListener.next(true);
-
-            const now = new Date();
-            const expirationDate = new Date(now.getTime() + expiresInDuration * 1000);
-
-            // Check if expirationDate is valid
-            if (isNaN(expirationDate.getTime())) {
-              console.error('Invalid expiration date:', expirationDate);
-              return; // Stop if expirationDate is not valid
-            }
-
-            console.log('Token expires at:', expirationDate);
-            this.saveAuthData(token, expirationDate);
-            this.router.navigate(['/admin/']).then(() => {
-              window.location.reload();
-            });
-          }
-        },
-        (error) => {
-          console.error('Login Error:', error);
-          this.authStatusListener.next(false);
-        }
-      );
+        this.router.navigate(['/admin']).then(() => {
+          window.location.reload();
+        });
+      }
+    },
+    (error) => {
+      console.error('Login Error:', error);
+      this.authStatusListener.next(false);
+    }
+  );
 }
+  
 
 
   getToken() {
@@ -101,14 +87,15 @@ export class AuthService {
   }
 
   private saveAuthData(token: string, expirationDate: Date) {
-    if (isNaN(expirationDate.getTime())) {
-      console.error('Invalid expiration date:', expirationDate);
-      return; // Tidak menyimpan jika expirationDate tidak valid
+    if (!this.isBrowser) {
+      console.warn('saveAuthData: Not running in a browser environment.');
+      return; // Jangan simpan jika bukan di browser
     }
-    console.log('Saving Auth Data:', { token, expirationDate });
+  
     localStorage.setItem('token', token);
     localStorage.setItem('expiration', expirationDate.toISOString());
   }
+  
 
   private clearAuthData() {
     localStorage.removeItem('token');
@@ -116,34 +103,36 @@ export class AuthService {
   }
 
   private getAuthData() {
-    let token = null;
-    let expirationDate = null;
-
-    if (this.isBrowser) {
-      token = localStorage.getItem('token');
-      expirationDate = localStorage.getItem('expiration');
+    if (!this.isBrowser) {
+      console.warn('getAuthData: Not running in a browser environment.');
+      return null;
     }
-
+  
+    const token = localStorage.getItem('token');
+    const expirationDate = localStorage.getItem('expiration');
+  
     if (!token || !expirationDate) {
-      return;
+      console.error('Auth data missing:', { token, expirationDate });
+      return null;
     }
-
+  
     const parsedExpirationDate = new Date(expirationDate);
-    
-    // Memastikan expirationDate valid
-    if (isNaN(parsedExpirationDate.getTime())) {
-      console.error('Invalid expiration date:', parsedExpirationDate);
-      return;
-    }
-
     return {
-      token: token,
+      token,
       expirationDate: parsedExpirationDate,
     };
-  }
+  } 
+  
 
   autoAuthUser() {
+    console.log('autoAuthUser: Called.');
+    if (!this.isBrowser) {
+      console.warn('autoAuthUser: Not running in a browser environment.');
+      return;
+    }
+  
     const authInformation = this.getAuthData();
+    console.log('autoAuthUser: Auth Information:', authInformation);
   
     if (!authInformation) {
       return;
@@ -158,8 +147,7 @@ export class AuthService {
       this.setAuthTimer(expiresIn / 1000);
       this.authStatusListener.next(true);
     }
-  }
-  
+  } 
 
 
   logout() {
