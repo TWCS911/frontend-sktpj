@@ -16,12 +16,14 @@ import {
     canActivate(
       route: ActivatedRouteSnapshot,
       state: RouterStateSnapshot
-    ): boolean | Observable<boolean> | Promise<boolean> {
+    ): boolean {
       const isAuth = this.authService.getIsAuth();
+      console.log('AuthGuard - isAuthenticated:', isAuth); // Debugging
+    
       if (!isAuth) {
         this.router.navigate(['/login']);
       }
       return isAuth;
-    }
+    }    
   }
   
