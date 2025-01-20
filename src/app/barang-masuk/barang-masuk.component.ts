@@ -6,6 +6,7 @@ import { Barang } from '../models/barang.model';
 import { Transaksi } from '../models/transaksi.model';
 import Swal from 'sweetalert2';
 import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-barang-masuk',
@@ -29,7 +30,8 @@ export class BarangMasukComponent implements OnInit, OnDestroy {
   constructor(
     private barangService: BarangService,
     private transaksiService: TransaksiService,
-    @Inject(PLATFORM_ID) private platformId: any
+    @Inject(PLATFORM_ID) private platformId: any,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -172,8 +174,7 @@ export class BarangMasukComponent implements OnInit, OnDestroy {
               icon: 'success',
               confirmButtonText: 'OK'
             }).then(() => {
-              // Refresh halaman untuk memuat data baru
-              window.location.reload();
+              this.router.navigate(['/admin']);
             });
           },
           (error) => {
